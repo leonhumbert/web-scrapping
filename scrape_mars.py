@@ -13,12 +13,13 @@ def init_browser():
 
 def scrape_info():
     browser = init_browser()
-
+    #create global dictionary for the scrapping data
     mars_data = {}
 
     #Visit Nasa Mars News url
     url = 'https://mars.nasa.gov/news/'
     browser.visit(url)
+    #needs rest!!! To self: time.sleep goes after the visit!!!
     time.sleep(3)
 
     #Scrape page into Soup
@@ -30,7 +31,7 @@ def scrape_info():
     news_title = soup.find('div', class_="content_title").text
     news_p = soup.find('div', class_="article_teaser_body").text
 
-    # Display scrapped data 
+    # Add scrapped data to the dictionary 
     mars_data['news_title'] = news_title
     mars_data['news_paragraph'] = news_p
 
@@ -58,12 +59,12 @@ def scrape_info():
     mars_data['featured_image_url'] = featured_image_url 
 
     #Mars Weather
-    #I am using req.get and xpath here
+    # I am using req.get and xpath here
     # Visit Mars Weather Twitter through splinter module
     weather_url = 'https://twitter.com/marswxreport?lang=en'
     browser.visit(weather_url)
 
-    # Request from weather_url
+    # Request response from weather_url
     twitter_response = req.get(weather_url)
 
     # Parse HTML with Beautiful Soup
@@ -98,7 +99,7 @@ def scrape_info():
     mars_df.to_html()
     mars_facts = mars_df.to_html()
 
-    # Display mars_df
+    # Add to global dictionary
     mars_data['mars_facts'] = mars_facts
 
     #Mars Hemispheres
@@ -115,7 +116,7 @@ def scrape_info():
     # Retreive all items that contain mars hemispheres information
     items = soup.find_all('div', class_='item')
 
-    # Create empty list for hemisphere urls 
+    # Create empty list for hemisphere urls they ARE 4!!!
     hemisphere_image_urls = []
 
     # Store the main_url 
@@ -123,10 +124,10 @@ def scrape_info():
 
     # Loop through the items previously stored
     for i in items: 
-        # Store title
+        # Grab and store title
         title = i.find('h3').text
         
-        # Store link that leads to full image website
+        # Store link that takes to full image website
         partial_img_url = i.find('a', class_='itemLink product-item')['href']
         
         # Visit the link that contains the full image website 
@@ -135,7 +136,7 @@ def scrape_info():
         # HTML Object of individual hemisphere information website 
         partial_img_html = browser.html
         
-        # Parse HTML with Beautiful Soup for every individual hemisphere information website 
+        # Parse HTML with BeautifulSoup for each individual information website 
         soup = bs( partial_img_html, 'html.parser')
         
         # Retrieve full image source 
@@ -143,7 +144,7 @@ def scrape_info():
         
         # Append the retreived information into a list of dictionaries 
         hemisphere_image_urls.append({"title" : title, "img_url" : img_url})
-    
+    #Add to global dictionary. choose a shorter name!!!
     mars_data['hiu'] = hemisphere_image_urls
 
     browser.quit()
